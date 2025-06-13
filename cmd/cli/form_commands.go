@@ -1,14 +1,15 @@
 package cli
 
 import (
-	"fmt"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/faelmori/xtui/components"
-	"github.com/faelmori/xtui/types"
-	"github.com/faelmori/xtui/wrappers"
-	"github.com/spf13/cobra"
+	"reflect"
 	"testing"
 	"time"
+
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/rafa-mori/xtui/components"
+	"github.com/rafa-mori/xtui/types"
+	"github.com/rafa-mori/xtui/wrappers"
+	"github.com/spf13/cobra"
 )
 
 func FormsCmdsList() []*cobra.Command {
@@ -33,38 +34,40 @@ func InputFormCommand() *cobra.Command {
 				Fields: types.FormFields{
 					Title: "Login",
 					Fields: []types.FormInputObject[any]{
-						types.NewFormInputObject(&types.InputField{
+						&types.Input[string]{
 							Ph:  "Username",
-							Tp:  "text",
+							Tp:  reflect.TypeFor[string](),
 							Val: "",
 							Req: true,
 							Min: 3,
 							Max: 20,
 							Err: "Username is required and must be between 3 and 20 characters.",
-							Vld: func(value string) error {
-								if len(value) < 3 || len(value) > 20 {
-									return fmt.Errorf("username must be between 3 and 20 characters")
-								}
-								return nil
-							},
+							//							: []types.ValidationRule{
+							//,								func(value string) error {
+							//									if len(value) < 3 || len(value) > 20 {
+							//										return fmt.Errorf("username must be between 3 and 20 characters")
+							//									}
+							//									return nil
+							//								}
+							//							},
 							ValidationRulesVal: []types.ValidationRule{types.Required},
-						}),
-						types.NewFormInputObject(&types.InputField{
+						},
+						&types.Input[string]{
 							Ph:  "Password",
-							Tp:  "password",
+							Tp:  reflect.TypeFor[string](),
 							Val: "",
 							Req: true,
 							Min: 6,
 							Max: 20,
 							Err: "Password is required and must be between 6 and 20 characters.",
-							Vld: func(value string) error {
-								if len(value) < 6 || len(value) > 20 {
-									return fmt.Errorf("password must be between 6 and 20 characters")
-								}
-								return nil
-							},
+							//Vld: func(value string) error {
+							//	if len(value) < 6 || len(value) > 20 {
+							//		return fmt.Errorf("password must be between 6 and 20 characters")
+							//	}
+							//	return nil
+							//},
 							ValidationRulesVal: []types.ValidationRule{types.Required},
-						}),
+						},
 					},
 				},
 			}

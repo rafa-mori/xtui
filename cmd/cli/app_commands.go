@@ -2,11 +2,14 @@ package cli
 
 import (
 	"fmt"
-	"github.com/faelmori/logz"
-	"github.com/faelmori/xtui/types"
-	. "github.com/faelmori/xtui/wrappers"
-	"github.com/spf13/cobra"
+
 	"strings"
+
+	"github.com/rafa-mori/logz"
+
+	//"github.com/rafa-mori/xtui/types"
+	. "github.com/rafa-mori/xtui/wrappers"
+	"github.com/spf13/cobra"
 )
 
 func AppsCmdsList() []*cobra.Command {

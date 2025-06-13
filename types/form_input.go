@@ -5,8 +5,8 @@ import "reflect"
 // FormInputObject is the most basic form input object. It will be used globally in all form input objects.
 type FormInputObject[T any] interface {
 	GetType() reflect.Type
-	GetValue() T
-	SetValue(T) error
+	GetValue() any
+	SetValue(t any) error
 }
 
 // InputObject is a struct that implements the FormInputObject interface. It is used to store the value
@@ -18,17 +18,20 @@ type InputObject[T any] struct {
 }
 
 func (s *InputObject[T]) GetType() reflect.Type { return reflect.TypeOf(s.Val) }
-func (s *InputObject[T]) GetValue() T           { return s.Val }
-func (s *InputObject[T]) SetValue(val T) error {
-	s.Val = val
+func (s *InputObject[T]) GetValue() any         { return s.Val }
+func (s *InputObject[T]) SetValue(val any) error {
+	s.Val = val.(T)
 	return nil
 }
 
 // -----------------------------------------------------------------------------
 // Here we have that will be used to create another package later, for now it is just a draft.
 
-type FormInput[T FormInputObject[T]] interface {
+type FormInput[T any] interface {
 	FieldDefinition
+
+	GetType() reflect.Type
+
 	// Common Getters
 
 	Placeholder() string
@@ -43,7 +46,7 @@ type FormInput[T FormInputObject[T]] interface {
 
 	// Common Setters
 
-	SetValue(T)
+	SetValue(t T) error
 	SetPlaceholder(string)
 
 	// Validation methods
@@ -64,9 +67,9 @@ type FormInput[T FormInputObject[T]] interface {
 	FromMap(map[string]interface{}) error
 }
 
-type Input[T FormInputObject[T]] struct {
-	FieldDefinition
-	FormInputObject[T]
+type Input[T any] struct {
+	// FieldDefinition
+	*InputObject[T]
 	Ph                 string           `json:"placeholder" yaml:"placeholder" gorm:"column:placeholder"`
 	Tp                 reflect.Type     `json:"type" yaml:"type" gorm:"column:type"`
 	Val                T                `json:"value" yaml:"value" gorm:"column:value"`
@@ -77,13 +80,88 @@ type Input[T FormInputObject[T]] struct {
 	ValidationRulesVal []ValidationRule `json:"validation_rules" yaml:"validation_rules" gorm:"column:validation_rules"`
 }
 
+func (s *Input[T]) Description() string {
+	if s != nil {
+		if reflect.ValueOf(s.Val).IsValid() && !reflect.ValueOf(s.Val).IsNil() {
+			v := s.GetValue()
+			vv := reflect.ValueOf(v)
+			if vv.Kind() == reflect.String {
+				strVal, ok := vv.Interface().(string)
+				if !ok {
+					return ""
+				}
+				if strVal != "" {
+					return strVal
+				}
+			} else if vv.Kind() == reflect.Int || vv.Kind() == reflect.Int64 || vv.Kind() == reflect.Int32 {
+				strVal, ok := vv.Interface().(int)
+				if !ok {
+					return ""
+				}
+				if strVal != 0 {
+					return string(rune(strVal))
+				}
+			} else if vv.Kind() == reflect.Float64 || vv.Kind() == reflect.Float32 {
+				strVal, ok := vv.Interface().(float64)
+				if !ok {
+					return ""
+				}
+				if strVal != 0.0 {
+					return string(rune(int(strVal)))
+				}
+			}
+		}
+	}
+	return ""
+}
+
+func (s *Input[T]) SetValue(t any) error {
+	s.Val = t.(T)
+	if s != nil {
+		if reflect.ValueOf(s.Val).IsValid() && !reflect.ValueOf(s.Val).IsNil() {
+			s.Tp = reflect.TypeOf(s.Val)
+		}
+	} else {
+		s.Tp = nil
+	}
+	if s.GetType() == nil {
+		return nil
+	}
+	if s.GetType().Kind() == reflect.String {
+		v := s.GetValue()
+		vv := reflect.ValueOf(v)
+		if vv.Kind() == reflect.String {
+			s.Val = vv.Interface().(T)
+		} else {
+			return nil // or an error if you want to handle it
+		}
+	}
+	return nil
+}
+func (s *Input[T]) GetType() reflect.Type {
+	if s != nil {
+		if reflect.ValueOf(s.Val).IsValid() && !reflect.ValueOf(s.Val).IsNil() {
+			return reflect.TypeOf(s.Val)
+		}
+	}
+	return nil
+}
+func (s *Input[T]) GetValue() any {
+	if s != nil {
+		if reflect.ValueOf(s.Val).IsValid() && !reflect.ValueOf(s.Val).IsNil() {
+			return s.Val
+		}
+	}
+	var zero T
+	return zero
+}
+
 func (s *Input[T]) MinValue() int                                           { return s.Min }
 func (s *Input[T]) MaxValue() int                                           { return s.Max }
 func (s *Input[T]) Validation() func(string, func(interface{}) error) error { return nil }
 func (s *Input[T]) Error() string                                           { return s.Err }
 func (s *Input[T]) SetMaxValue(i int)                                       { s.Max = i }
 func (s *Input[T]) Placeholder() string                                     { return s.Ph }
-func (s *Input[T]) SetValue(t T)                                            { s.Val = t }
 
 // // Boolean methods
 
@@ -119,7 +197,7 @@ func (s *Input[T]) Validate() error {
 		return nil
 	}
 	for _, rule := range s.ValidationRulesVal {
-		if s.Val != nil {
+		if reflect.ValueOf(rule).IsValid() && !reflect.ValueOf(rule).IsNil() {
 			if err := rule.Validate(s.String(), nil); err != nil {
 				return err
 			}
@@ -129,7 +207,7 @@ func (s *Input[T]) Validate() error {
 }
 func (s *Input[T]) String() string {
 	if s != nil {
-		if s.Val != nil {
+		if reflect.ValueOf(s.Val).IsValid() && !reflect.ValueOf(s.Val).IsNil() {
 			if s.GetType().Kind() == reflect.String {
 				v := s.GetValue()
 				vv := reflect.ValueOf(v)
@@ -144,7 +222,7 @@ func (s *Input[T]) String() string {
 
 func (s *Input[T]) FromString(str string) error {
 	if s != nil {
-		if s.Val != nil {
+		if reflect.ValueOf(s.Val).IsValid() && !reflect.ValueOf(s.Val).IsNil() {
 			v := s.GetValue()
 			vv := reflect.ValueOf(v)
 			vv.SetString(str)
@@ -165,30 +243,5 @@ func (s *Input[T]) ToMap() map[string]interface{} {
 }
 func (s *Input[T]) FromMap(m map[string]interface{}) error { return nil }
 
-func NewInput[T FormInputObject[T]](t T) *Input[T]        { return &Input[T]{Val: t} }
-func NewFormInput[T FormInputObject[T]](t T) FormInput[T] { return NewInput[T](t) }
-func NewFormInputFromMap[T FormInputObject[T]](m map[string]interface{}) FormInput[T] {
-	return NewInput[T](m["value"].(T))
-}
-func NewFormInputFromString[T FormInputObject[T]](str string) FormInput[T] {
-	v := reflect.ValueOf(str)
-	return NewInput[T](v.Interface().(T))
-}
-func NewFormInputFromBytes[T FormInputObject[T]](b []byte) FormInput[T] {
-	v := reflect.ValueOf(b)
-	return NewInput[T](v.Interface().(T))
-}
-
-func NewInputObject[T any](t T) *InputObject[T]        { return &InputObject[T]{Val: t} }
-func NewFormInputObject[T any](t T) FormInputObject[T] { return NewInputObject[T](t) }
-func NewFormInputObjectFromMap[T any](m map[string]interface{}) FormInputObject[T] {
-	return NewInputObject[T](m["value"])
-}
-func NewFormInputObjectFromString[T any](str string) FormInputObject[T] {
-	v := reflect.ValueOf(str)
-	return NewInputObject[T](v.Interface().(T))
-}
-func NewFormInputObjectFromBytes[T any](b []byte) FormInputObject[T] {
-	v := reflect.ValueOf(b)
-	return NewInputObject[T](v.Interface().(T))
-}
+func NewInputObject[T any](t T) *InputObject[T]                { return &InputObject[T]{Val: t} }
+func NewFormInputObject[T FormInput[any]](t T) *InputObject[T] { return NewInputObject[T](t) }

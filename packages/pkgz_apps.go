@@ -2,13 +2,15 @@ package packages
 
 import (
 	"fmt"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/faelmori/logz"
-	cmp "github.com/faelmori/xtui/components"
-	t "github.com/faelmori/xtui/types"
 	"os"
 	"os/exec"
+	"reflect"
 	"strings"
+
+	"github.com/charmbracelet/lipgloss"
+	"github.com/rafa-mori/logz"
+	cmp "github.com/rafa-mori/xtui/components"
+	t "github.com/rafa-mori/xtui/types"
 )
 
 // AppInfo show information about an installed application.
@@ -211,23 +213,23 @@ func ShowInstalledAppsTable(args ...string) error {
 		"row":    lipgloss.Color("#252"),
 	}
 
-	var fields []t.Field
+	var fields []t.FormInput[any]
 	for _, header := range handler.GetHeaders() {
-		fields = append(fields, &t.InputField{
-			Ph:  header,
-			Tp:  "text",
-			Val: "",
-			Req: false,
-			Min: 0,
-			Max: 0,
-			Err: "",
-			Vld: nil,
+		fields = append(fields, &t.Input[string]{
+			Ph:                 header,
+			Tp:                 reflect.TypeFor[string](),
+			Val:                "",
+			Req:                false,
+			Min:                0,
+			Max:                0,
+			Err:                "",
+			ValidationRulesVal: nil,
 		})
 	}
 	return cmp.StartTableScreen(
 		t.FormConfig{
-			Title:  "Installed Apps",
-			Fields: fields,
+			Title:      "Installed Apps",
+			FormFields: nil,
 		},
 		customStyles,
 	)

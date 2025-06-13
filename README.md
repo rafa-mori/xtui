@@ -46,7 +46,7 @@
 To install **xtui**, run the following command:
 
 ```sh
-go get github.com/faelmori/xtui
+go get github.com/rafa-mori/xtui
 ```
 
 ## Usage
@@ -57,8 +57,8 @@ Here’s a quick example demonstrating how to use **xtui** for displaying tables
 package main
 
 import (
-    "github.com/faelmori/xtui"
-    "github.com/faelmori/xtui/types"
+    "github.com/rafa-mori/xtui"
+    "github.com/rafa-mori/xtui/types"
     "github.com/charmbracelet/lipgloss"
 )
 
@@ -87,8 +87,8 @@ For form-based interactions:
 package main
 
 import (
-    "github.com/faelmori/xtui"
-    "github.com/faelmori/xtui/types"
+    "github.com/rafa-mori/xtui"
+    "github.com/rafa-mori/xtui/types"
 )
 
 func main() {
@@ -144,7 +144,7 @@ go run main.go loader-form
 package main
 
 import (
-    "github.com/faelmori/xtui/wrappers"
+    "github.com/rafa-mori/xtui/wrappers"
 )
 
 func main() {
@@ -160,7 +160,7 @@ func main() {
 package main
 
 import (
-    "github.com/faelmori/xtui/wrappers"
+    "github.com/rafa-mori/xtui/wrappers"
 )
 
 func main() {

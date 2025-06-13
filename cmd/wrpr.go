@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/faelmori/xtui/cmd/cli"
-	. "github.com/faelmori/xtui/services"
-	. "github.com/faelmori/xtui/wrappers"
+
+	"github.com/rafa-mori/xtui/cmd/cli"
+	. "github.com/rafa-mori/xtui/services"
+	. "github.com/rafa-mori/xtui/wrappers"
 	"github.com/spf13/cobra"
 )
 

@@ -2,13 +2,15 @@ package cli
 
 import (
 	"fmt"
-	"github.com/faelmori/logz"
-	p "github.com/faelmori/xtui/packages"
-	"github.com/faelmori/xtui/types"
-	"github.com/spf13/cobra"
+
+	"github.com/rafa-mori/logz"
+	p "github.com/rafa-mori/xtui/packages"
 	"os"
 	"reflect"
 	"strings"
+
+	//"github.com/rafa-mori/xtui/types"
+	"github.com/spf13/cobra"
 )
 
 // appsCmdsList retorna uma lista de comandos Cobra relacionados a aplicativos.
@@ -227,17 +229,17 @@ func InstallDepsHandler(args ...string) error {
 	return p.InstallApps(scriptPath)
 }
 
-func getAvailableProperties() map[string]string {
-	return map[string]string{
-		"property1": "value1",
-		"property2": "value2",
-	}
-}
+//func getAvailableProperties() map[string]string {
+//	return map[string]string{
+//		"property1": "value1",
+//		"property2": "value2",
+//	}
+//}
 
-func adaptArgsToProperties(args []string, properties map[string]string) []string {
-	adaptedArgs := args
-	for key, value := range properties {
-		adaptedArgs = append(adaptedArgs, fmt.Sprintf("--%s=%s", key, value))
-	}
-	return adaptedArgs
-}
+//func adaptArgsToProperties(args []string, properties map[string]string) []string {
+//	adaptedArgs := args
+//	for key, value := range properties {
+//		adaptedArgs = append(adaptedArgs, fmt.Sprintf("--%s=%s", key, value))
+//	}
+//	return adaptedArgs
+//}

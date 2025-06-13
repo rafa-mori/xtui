@@ -10,8 +10,8 @@ import (
 	"reflect"
 	"strings"
 
-	gl "github.com/faelmori/xtui/logger"
 	"github.com/pelletier/go-toml/v2"
+	gl "github.com/rafa-mori/xtui/logger"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
 )

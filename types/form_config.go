@@ -10,7 +10,7 @@ func (c Config) GetFields() FormFields { return c.Fields }
 
 type FormConfig struct {
 	Title string
-	FormFields
+	*FormFields
 }
 
 func (f FormConfig) GetTitle() string                  { return f.Title }

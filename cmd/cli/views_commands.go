@@ -1,11 +1,13 @@
 package cli
 
 import (
-	"github.com/charmbracelet/lipgloss"
-	"github.com/faelmori/xtui/components"
-	t "github.com/faelmori/xtui/types"
-	"github.com/spf13/cobra"
+	"reflect"
 	"testing"
+
+	"github.com/charmbracelet/lipgloss"
+	"github.com/rafa-mori/xtui/components"
+	t "github.com/rafa-mori/xtui/types"
+	"github.com/spf13/cobra"
 )
 
 func ViewsCmdsList() []*cobra.Command {
@@ -30,17 +32,20 @@ func tableViewCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			config := t.FormConfig{
 				Title: "Sample Table",
-				Fields: []t.FormInputObject[any]{
-					t.NewFormInputObject(&t.InputField{
-						Ph:  "Column1",
-						Tp:  "text",
-						Val: "Value1",
-					}),
-					t.NewFormInputObject(&t.InputField{
-						Ph:  "Column2",
-						Tp:  "text",
-						Val: "Value2",
-					}),
+				FormFields: &t.FormFields{
+					Title: "Sample Table Fields",
+					Fields: []t.FormInputObject[any]{
+						t.NewFormInputObject(&t.Input[string]{
+							Ph:  "Column1",
+							Tp:  reflect.TypeFor[string](),
+							Val: "Value1",
+						}),
+						t.NewFormInputObject(&t.Input[string]{
+							Ph:  "Column2",
+							Tp:  reflect.TypeFor[string](),
+							Val: "Value2",
+						}),
+					},
 				},
 			}
 			customStyles := map[string]lipgloss.Color{

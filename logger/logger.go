@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"strings"
 
-	l "github.com/faelmori/logz"
+	l "github.com/rafa-mori/logz"
 )
 
 type gLog struct {

@@ -3,7 +3,6 @@ package wrappers
 import (
 	"bufio"
 	"fmt"
-	"github.com/faelmori/logz"
 	"os"
 	"os/exec"
 	"strconv"
@@ -11,9 +10,10 @@ import (
 	"sync"
 	"time"
 
+	gl "github.com/rafa-mori/xtui/logger"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/faelmori/xtui/types"
 )
 
 var (
@@ -105,11 +105,11 @@ func streamLogs(moduleColors map[string]string, mu *sync.Mutex) tea.Cmd {
 		cmd := exec.Command("kbx", "log", "--show=all", "-f")
 		stdout, err := cmd.StdoutPipe()
 		if err != nil {
-			logz.GetLogger("xtui").Panic("failed to get stdout pipe", "streamLogs")
+			gl.Log("fatal", "failed to get stdout pipe")
 		}
 
 		if err := cmd.Start(); err != nil {
-			logz.GetLogger("xtui").Panic("failed to start command: %v", err)
+			gl.Log("fatal", "failed to start command")
 		}
 
 		scanner := bufio.NewScanner(stdout)
@@ -121,7 +121,7 @@ func streamLogs(moduleColors map[string]string, mu *sync.Mutex) tea.Cmd {
 			return coloredLogLine
 		}
 		if err := scanner.Err(); err != nil {
-			logz.GetLogger("xtui").Panic("error reading stdout: %v", err)
+			gl.Log("fatal", "error reading stdout")
 		}
 		return ""
 	}
@@ -134,7 +134,8 @@ func updateTreeView(mu *sync.Mutex) tea.Cmd {
 		cmd := exec.Command("tree", os.Getenv("HOME")+"/.cache/kubex", "-s", "--du", "-C", "-h", "-P", "*.log")
 		stdout, err := cmd.Output()
 		if err != nil {
-			logz.GetLogger("xtui").Panic("failed to execute command: %v", err)
+			//logz.GetLogger("xtui").Panic("failed to execute command: %v", err)
+			gl.Log("fatal", "failed to execute command")
 		}
 		treeView := string(stdout)
 		treeHeight = len(strings.Split(treeView, "\n")) + 3

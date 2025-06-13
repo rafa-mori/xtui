@@ -3,7 +3,7 @@ package types
 // New interfaces and structs for customization options, validation, and layout
 
 type CustomizableField interface {
-	FormInput[FormInputObject[any]]
+	FormInputObject[any]
 	Label() string
 	DefaultValue() string
 	Group() string

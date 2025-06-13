@@ -5,17 +5,18 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
-	"github.com/atotto/clipboard"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/lipgloss/table"
-	"github.com/faelmori/logz"
-	. "github.com/faelmori/xtui/types"
-	"gopkg.in/yaml.v2"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/atotto/clipboard"
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss/table"
+	"github.com/rafa-mori/logz"
+	. "github.com/rafa-mori/xtui/types"
+	"gopkg.in/yaml.v2"
 )
 
 type TableRenderer struct {
@@ -37,7 +38,7 @@ type TableRenderer struct {
 func NewTableRenderer(config FormConfig, customStyles map[string]lipgloss.Color) *TableRenderer {
 	headers := make([]string, len(config.Fields))
 	for i, field := range config.Fields {
-		headers[i] = field.Placeholder()
+		headers[i] = field.GetValue().(string)
 	}
 
 	rows := make([][]string, 0)

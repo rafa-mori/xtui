@@ -2,15 +2,15 @@ package wrappers
 
 import (
 	"fmt"
+	"log"
+	"os/exec"
+	"strings"
+
 	"github.com/charmbracelet/bubbles/progress"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/faelmori/logz"
-	"github.com/faelmori/xtui/types"
-	"log"
-	"os/exec"
-	"strings"
+	"github.com/rafa-mori/logz"
 )
 
 type AppDepsModel struct {

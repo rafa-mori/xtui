@@ -2,14 +2,15 @@ package components
 
 import (
 	"fmt"
-	"github.com/faelmori/logz"
 	"strings"
+
+	//"github.com/rafa-mori/logz"
 
 	"github.com/charmbracelet/bubbles/cursor"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	. "github.com/faelmori/xtui/types"
+	. "github.com/rafa-mori/xtui/types"
 )
 
 var (
@@ -44,10 +45,10 @@ func initialFormModel(config Config) FormModel {
 		inputs = append(inputs, field)
 	}
 
-	availableProperties := getAvailableProperties()
-	if len(availableProperties) > 0 {
-		inputs = adaptInputsToProperties(inputs, availableProperties)
-	}
+	//availableProperties := getAvailableProperties()
+	//if len(availableProperties) > 0 {
+	//	inputs = adaptInputsToProperties(inputs, availableProperties)
+	//}
 
 	m := FormModel{
 		Title:        cfg.Title,
@@ -63,10 +64,10 @@ func initialFormModel(config Config) FormModel {
 		t = textinput.New()
 		t.Cursor.Style = cursorStyle
 		t.CharLimit = 32
-		t.Placeholder = field.(FormInput[any]).Placeholder()
-		t.SetValue(field.(FormInput[any]).String())
+		t.Placeholder = field.(FormInput[FormInputObject[any]]).Placeholder()
+		t.SetValue(field.(FormInput[FormInputObject[any]]).String())
 
-		if field.(FormInput[any]).GetType().String() == "password" {
+		if field.(FormInput[FormInputObject[any]]).String() == "password" {
 			t.EchoMode = textinput.EchoPassword
 			t.EchoCharacter = '•'
 		}
@@ -176,62 +177,62 @@ func (m *FormModel) View() string {
 }
 
 func (m *FormModel) submit() tea.Cmd {
-	for i, input := range m.Inputs {
-		value := input.Value()
-		field := m.Fields[i].(FormInput[any])
-
-		if field.IsRequired() && value == "" {
-			m.ErrorMessage = field.Error()
-			return nil
-		}
-		if field.MinValue() > 0 && len(value) < field.MinValue() {
-			m.ErrorMessage = field.Error()
-			return nil
-		}
-		if field.MaxValue() > 0 && len(value) > field.MaxValue() {
-			m.ErrorMessage = field.Error()
-			return nil
-		}
-		if field.Validation()(value, nil) != nil {
-			if err := field.Validation()(value, nil); err != nil {
-				m.ErrorMessage = err.Error()
-				return nil
-			}
-		}
-
-		inputResult[fmt.Sprintf("field%d", i)] = value
-	}
-
-	m.ErrorMessage = ""
+	//for i, input := range m.Inputs {
+	//	value := input.Value()
+	//	field := m.Fields[i].(FormInput[FormInputObject[any]])
+	//
+	//	if field.IsRequired() && value == "" {
+	//		m.ErrorMessage = field.Error()
+	//		return nil
+	//	}
+	//	if field.MinValue() > 0 && len(value) < field.MinValue() {
+	//		m.ErrorMessage = field.Error()
+	//		return nil
+	//	}
+	//	if field.MaxValue() > 0 && len(value) > field.MaxValue() {
+	//		m.ErrorMessage = field.Error()
+	//		return nil
+	//	}
+	//	if field.Validation()(value, nil) != nil {
+	//		if err := field.Validation()(value, nil); err != nil {
+	//			m.ErrorMessage = err.Error()
+	//			return nil
+	//		}
+	//	}
+	//
+	//	inputResult[fmt.Sprintf("field%d", i)] = value
+	//}
+	//
+	//m.ErrorMessage = ""
 	return tea.Quit
 }
 
 func ShowForm(config Config) (map[string]string, error) {
 	inputResult = make(map[string]string)
-	var newConfig Config
-	var newFields = config.Fields.Inputs()
-	if newFields == nil {
-		iNewConfig := FormConfig{
-			Title:  config.Title,
-			Fields: nil,
-		}
-		newConfig = Config{
-			Title: iNewConfig.Title,
-			Fields: FormFields{
-				Title:  iNewConfig.Title,
-				Fields: config.GetFields().Inputs(),
-			},
-		}
-	}
-	initialModel := initialFormModel(newConfig)
-	_, resultModelErr := tea.NewProgram(&initialModel).Run()
-	if resultModelErr != nil {
-		logz.Error("Error running form model.", map[string]interface{}{
-			"context": "ShowForm",
-			"error":   resultModelErr,
-		})
-		return nil, resultModelErr
-	}
+	//var newConfig Config
+	//var newFields = config.Fields.Inputs()
+	//if newFields == nil {
+	//	iNewConfig := FormConfig{
+	//		Title:      config.Title,
+	//		FormFields: nil,
+	//	}
+	//	newConfig = Config{
+	//		Title: iNewConfig.Title,
+	//		Fields: FormFields{
+	//			Title:  iNewConfig.Title,
+	//			Fields: config.GetFields().Inputs(),
+	//		},
+	//	}
+	//}
+	//initialModel := initialFormModel(newConfig)
+	//_, resultModelErr := tea.NewProgram(&initialModel).Run()
+	//if resultModelErr != nil {
+	//	logz.Error("Error running form model.", map[string]interface{}{
+	//		"context": "ShowForm",
+	//		"error":   resultModelErr,
+	//	})
+	//	return nil, resultModelErr
+	//}
 	return inputResult, nil
 }
 
@@ -243,28 +244,4 @@ func (m *FormModel) updateInputs(msg tea.Msg) tea.Cmd {
 	}
 
 	return tea.Batch(cmds...)
-}
-
-func getAvailableProperties() map[string]string {
-	return map[string]string{
-		"property1": "value1",
-		"property2": "value2",
-	}
-}
-
-func adaptInputsToProperties(inputs []FormInputObject[any], properties map[string]string) []FormInputObject[any] {
-	adaptedInputs := inputs
-	for key, value := range properties {
-		adaptedInputs = append(adaptedInputs, NewFormInputObject(&InputField{
-			Ph:  key,
-			Tp:  "text",
-			Val: value,
-			Req: false,
-			Min: 0,
-			Max: 100,
-			Err: "",
-			Vld: func(value string) error { return nil },
-		}))
-	}
-	return adaptedInputs
 }

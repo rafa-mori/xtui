@@ -3,10 +3,11 @@ package version
 import (
 	_ "embed"
 	"fmt"
-	"github.com/spf13/cobra"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -36,7 +37,7 @@ var (
 	}
 )
 
-const gitModelUrl = "https://github.com/faelmori/xtui.git"
+const gitModelUrl = "https://github.com/rafa-mori/xtui.git"
 const currentVersionFallback = "v1.1.0" // First version with the version file
 
 //go:embed CLI_VERSION
